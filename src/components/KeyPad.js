@@ -7,7 +7,7 @@ import KeyButton from "./KeyButton.js";
 export default class KeyPad {
   constructor(lang, isShiftDown) {
     this.keyPad = render('div', 'keyPad');
-    this.keyPad.setAttribute('language', lang);
+    // this.keyPad.dataset['language'] = lang;
     document.querySelector('main').appendChild(this.keyPad);
     this.rowsKey = rowsKey;
     this.keyButtons = [];
