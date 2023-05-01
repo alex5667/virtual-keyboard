@@ -5,13 +5,14 @@ import KeyButton from "./KeyButton.js";
 
 
 export default class KeyPad {
-  constructor(lang) {
+  constructor(lang, isShiftDown) {
     this.keyPad = render('div', 'keyPad');
     this.keyPad.setAttribute('language', lang);
     document.querySelector('main').appendChild(this.keyPad);
     this.rowsKey = rowsKey;
     this.keyButtons = [];
     this.langBase = langBase[lang];
+    this.isShiftDown = isShiftDown;
     this.render();
   }
 
@@ -24,7 +25,7 @@ export default class KeyPad {
       row.forEach((code) => {
         const btnObj = this.langBase.find((key) => key.code === code);
         if (btnObj) {
-          const keyButton = new KeyButton(btnObj);
+          const keyButton = new KeyButton(btnObj, this.isShiftDown);
           this.keyButtons.push(keyButton);
           keyPadRow.appendChild(keyButton.keyPadBtn);
         }
