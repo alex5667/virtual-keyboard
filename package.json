@@ -5,6 +5,7 @@
   "author": "",
   "private": true,
   "license": "",
+  "type": "module",
   "scripts": {
     "start": "npm i --legacy-peer-deps",
     "dev": "gulp && webpack serve --progress -c config/webpack.dev.js",

@@ -1,9 +1,8 @@
 
-import Keyboard from "../components/KeyBoard";
-import { Header } from "../components/Header";
+import Keyboard from "../components/KeyBoard.js";
+import { Header } from "../components/Header.js";
 import "../scss/style.scss";
 
 
 Header();
-const keyBoard = new Keyboard();
-keyBoard.init();
+new Keyboard();
