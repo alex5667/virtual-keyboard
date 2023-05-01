@@ -12,10 +12,10 @@ export default class KeyPad {
     this.rowsKey = rowsKey;
     this.keyButtons = [];
     this.langBase = langBase[lang];
-    this.generateRows();
+    this.render();
   }
 
-  generateRows() {
+  render() {
     this.rowsKey.forEach((row, i) => {
       const keyPadRow = render('div', 'keyPad__row');
       keyPadRow.id = `row-${i + 1}`;
