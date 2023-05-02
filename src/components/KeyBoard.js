@@ -100,9 +100,6 @@ export default class Keyboard {
       this.keyPad = new KeyPad(this.lang, false);
     }
   }
-
-
-
 }
 
 
