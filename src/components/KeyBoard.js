@@ -25,7 +25,7 @@ export default class Keyboard {
     document.addEventListener('keyup', (e) => this.handleKeyUp(e));
     document.addEventListener('mousedown', (e) => this.mouseEvent(e));
     document.addEventListener('mouseup', (e) => this.mouseEvent(e));
-    
+
 
   }
 
@@ -69,9 +69,26 @@ export default class Keyboard {
       btn.keyPadBtn.classList.add('active');
       this.btnPressed[btn.code] = btn;
       this.textarea.focus();
+      if (!event.type) btn.symbol.addEventListener('mouseleave', (e) => this.resetBtnState(e), { once: true });
     }
+  }
 
-
+  resetBtnState(event) {
+    const currentCode = event.target.closest('.keyPad__btn').id;
+    const pressed = Object.keys(this.btnPressed);
+    clearTimeout(this.timeOut);
+    clearInterval(this.interval);
+    pressed.forEach((code) => {
+      const key = this.btnPressed[code];
+      if (key) {
+        if (currentCode && currentCode === code && key.small === 'Shift') {
+          this.shiftKey = false;
+          this.switchUpperCase(false);
+        }
+        key.div.classList.remove('active');
+        delete this.btnPressed[code];
+      }
+    });
   }
 
   handleKeyUp(event) {
@@ -128,50 +145,50 @@ export default class Keyboard {
     let cursorPos = this.textarea.selectionStart;
     const left = this.textarea.value.slice(0, cursorPos);
     const right = this.textarea.value.slice(cursorPos);
-  
+
     switch (btn.code) {
       case 'Tab':
         this.textarea.value = `${left}\t${right}`;
         cursorPos++;
         break;
-  
+
       case 'ArrowLeft':
         cursorPos = cursorPos - 1 >= 0 ? cursorPos - 1 : 0;
         break;
-  
+
       case 'ArrowRight':
         cursorPos++;
         break;
-  
+
       case 'ArrowUp':
         const positionFromUp = this.textarea.value.slice(0, cursorPos).match(/(\n).*$(?!\1)/g) || [[1]];
         cursorPos -= positionFromUp[0].length;
         break;
-  
+
       case 'ArrowDown':
         const positionFromDown = this.textarea.value.slice(cursorPos).match(/^.*(\n).*(?!\1)/) || [[1]];
         cursorPos += positionFromDown[0].length + 1;
         break;
-  
+
       case 'Enter':
         this.textarea.value = `${left}\n${right}`;
         cursorPos++;
         break;
-  
+
       case 'Delete':
         this.textarea.value = `${left}${right.slice(1)}`;
         break;
-  
+
       case 'Backspace':
         this.textarea.value = `${left.slice(0, -1)}${right}`;
         cursorPos--;
         break;
-  
+
       case 'Space':
         this.textarea.value = `${left} ${right}`;
         cursorPos += 1;
         break;
-  
+
       default:
         if (!btn.isFnKey) {
           cursorPos += 1;
@@ -179,11 +196,11 @@ export default class Keyboard {
         }
         break;
     }
-  
+
     this.textarea.setSelectionRange(cursorPos, cursorPos);
   }
 
-  mouseEvent(event){
+  mouseEvent(event) {
     event.preventDefault();
     const btnDiv = event.target.closest('.keyPad__btn');
     if (!btnDiv) return;
