@@ -21,8 +21,11 @@ export default class Keyboard {
   }
 
   addEventListeners() {
-    document.addEventListener('keydown', (e) => this.handleKeyDown(e))
-    document.addEventListener('keyup', (e) => this.handleKeyUp(e))
+    document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+    document.addEventListener('keyup', (e) => this.handleKeyUp(e));
+    document.addEventListener('mousedown', (e) => this.mouseEvent(e));
+    document.addEventListener('mouseup', (e) => this.mouseEvent(e));
+    
 
   }
 
@@ -62,8 +65,6 @@ export default class Keyboard {
 
           this.handleKeyPress(btn, shouldUseShift ? btn.shift : btn.small);
         }
-
-
       }
       btn.keyPadBtn.classList.add('active');
       this.btnPressed[btn.code] = btn;
@@ -182,7 +183,33 @@ export default class Keyboard {
     this.output.setSelectionRange(cursorPos, cursorPos);
   }
 
-
+  mouseEvent(event){
+    event.preventDefault();
+    const btnDiv = event.target.closest('.keyPad__btn');
+    if (!btnDiv) return;
+    const code = event.target.closest('.keyPad__btn').id;
+    console.log(code);
+    if (event.type === 'mouseup') {
+      this.shiftKey = !!(code === 'ShiftLeft' || code === 'ShiftRight') ? true : this.shiftKey;
+      this.ctrlKey = code.match(/Control/) ? false : this.ctrlKey;
+      clearTimeout(this.timeOut);
+      clearInterval(this.interval);
+      this.handleKeyUp({ code });
+    } else {
+      this.shiftKey = (code === 'ShiftLeft' || code === 'ShiftRight') ? !this.shiftKey : this.shiftKey;
+      this.ctrlKey = code.match(/Control/) ? false : this.ctrlKey;
+      if (!code.match(/Alt|Caps|Control/)) {
+        this.timeOut = setTimeout(() => {
+          this.interval = setInterval(() => {
+            this.handleKeyDown({ code });
+          }, 35);
+        }, 500);
+      }
+      this.handleKeyDown({ code });
+    }
+    this.textarea.focus();
+  }
 }
+
 
 
