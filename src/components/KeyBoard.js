@@ -30,8 +30,9 @@ export default class Keyboard {
   }
 
   handleKeyDown(event) {
-    const { code } = event;
+    const { code, ctrlKey, shiftKey } = event;
     const btn = this.keyPad.keyButtons.find((key) => key.code === code);
+    console.log(btn);
     if (btn) {
       if ((!event.type || event.type) && btn.keycode === '16') this.shiftKey = true;
       if (btn.keycode === '16') this.changeToUpperCase(true);
@@ -47,24 +48,23 @@ export default class Keyboard {
       if (btn.keycode === '18' && this.ctrlKey) {
         if (event.type) event.preventDefault();
         this.changeLanguage();
+      }
+      const regexp = /Tab|ArrowLeft|ArrowUp|ArrowDown|ArrowRight|Delete|Backspace|Enter/i;
+      const isFnKeyOrCtrl = btn.isFn || ctrlKey;
+      const isTabOrAlt = btn.code === 'Tab' || btn.code === 'Alt';
+      const isRegExpMatch = !event.type && btn.code.match(regexp);
 
-        const regexp = /Tab|ArrowLeft|ArrowUp|ArrowDown|ArrowRight|Delete|Backspace|Enter/i;
-        const isFnKeyOrCtrl = btn.isFn || ctrlKey;
-        const isTabOrAlt = btn.code === 'Tab' || btn.code === 'Alt';
-        const isRegExpMatch = !event.type && btn.code.match(regexp);
-
-        if (!isFnKeyOrCtrl || isTabOrAlt || isRegExpMatch) {
-          if (event.type) {
-            event.preventDefault();
-          }
-
-          const isShiftKey = shiftKey || this.shiftKey;
-          const isCapsAndHasInnerText = this.isCaps && btn.symbol.innerText;
-          const isCapsAndShiftKey = this.isCaps && isShiftKey;
-          const shouldUseShift = isCapsAndHasInnerText || isCapsAndShiftKey || (isShiftKey && !this.isCaps);
-
-          this.handleKeyPress(btn, shouldUseShift ? btn.shift : btn.small);
+      if (!isFnKeyOrCtrl || isTabOrAlt || isRegExpMatch) {
+        if (event.type) {
+          event.preventDefault();
         }
+
+        const isShiftKey = shiftKey || this.shiftKey;
+        const isCapsAndHasInnerText = this.isCaps && btn.symbol.innerText;
+        const isCapsAndShiftKey = this.isCaps && isShiftKey;
+        const shouldUseShift = isCapsAndHasInnerText || isCapsAndShiftKey || (isShiftKey && !this.isCaps);
+
+        this.handleKeyPress(btn, shouldUseShift ? btn.shift : btn.small);
       }
       btn.keyPadBtn.classList.add('active');
       this.btnPressed[btn.code] = btn;
@@ -124,14 +124,14 @@ export default class Keyboard {
     }
   }
 
-  handleKeyPress(keyObj, symbol) {
-    let cursorPos = this.output.selectionStart;
-    const left = this.output.value.slice(0, cursorPos);
-    const right = this.output.value.slice(cursorPos);
+  handleKeyPress(btn, symbol) {
+    let cursorPos = this.textarea.selectionStart;
+    const left = this.textarea.value.slice(0, cursorPos);
+    const right = this.textarea.value.slice(cursorPos);
   
-    switch (keyObj.code) {
+    switch (btn.code) {
       case 'Tab':
-        this.output.value = `${left}\t${right}`;
+        this.textarea.value = `${left}\t${right}`;
         cursorPos++;
         break;
   
@@ -144,43 +144,43 @@ export default class Keyboard {
         break;
   
       case 'ArrowUp':
-        const positionFromUp = this.output.value.slice(0, cursorPos).match(/(\n).*$(?!\1)/g) || [[1]];
+        const positionFromUp = this.textarea.value.slice(0, cursorPos).match(/(\n).*$(?!\1)/g) || [[1]];
         cursorPos -= positionFromUp[0].length;
         break;
   
       case 'ArrowDown':
-        const positionFromDown = this.output.value.slice(cursorPos).match(/^.*(\n).*(?!\1)/) || [[1]];
+        const positionFromDown = this.textarea.value.slice(cursorPos).match(/^.*(\n).*(?!\1)/) || [[1]];
         cursorPos += positionFromDown[0].length + 1;
         break;
   
       case 'Enter':
-        this.output.value = `${left}\n${right}`;
+        this.textarea.value = `${left}\n${right}`;
         cursorPos++;
         break;
   
       case 'Delete':
-        this.output.value = `${left}${right.slice(1)}`;
+        this.textarea.value = `${left}${right.slice(1)}`;
         break;
   
       case 'Backspace':
-        this.output.value = `${left.slice(0, -1)}${right}`;
+        this.textarea.value = `${left.slice(0, -1)}${right}`;
         cursorPos--;
         break;
   
       case 'Space':
-        this.output.value = `${left} ${right}`;
+        this.textarea.value = `${left} ${right}`;
         cursorPos += 1;
         break;
   
       default:
-        if (!keyObj.isFnKey) {
+        if (!btn.isFnKey) {
           cursorPos += 1;
-          this.output.value = `${left}${symbol || ''}${right}`;
+          this.textarea.value = `${left}${symbol || ''}${right}`;
         }
         break;
     }
   
-    this.output.setSelectionRange(cursorPos, cursorPos);
+    this.textarea.setSelectionRange(cursorPos, cursorPos);
   }
 
   mouseEvent(event){
@@ -188,22 +188,21 @@ export default class Keyboard {
     const btnDiv = event.target.closest('.keyPad__btn');
     if (!btnDiv) return;
     const code = event.target.closest('.keyPad__btn').id;
-    console.log(code);
     if (event.type === 'mouseup') {
-      this.shiftKey = !!(code === 'ShiftLeft' || code === 'ShiftRight') ? true : this.shiftKey;
-      this.ctrlKey = code.match(/Control/) ? false : this.ctrlKey;
+      this.shiftKey = ['ShiftLeft', 'ShiftRight'].includes(code) ? true : this.shiftKey;
+      this.ctrlKey = code.includes('Control') ? false : this.ctrlKey;
       clearTimeout(this.timeOut);
       clearInterval(this.interval);
       this.handleKeyUp({ code });
     } else {
-      this.shiftKey = (code === 'ShiftLeft' || code === 'ShiftRight') ? !this.shiftKey : this.shiftKey;
-      this.ctrlKey = code.match(/Control/) ? false : this.ctrlKey;
-      if (!code.match(/Alt|Caps|Control/)) {
+      this.shiftKey = ['ShiftLeft', 'ShiftRight'].includes(code) ? !this.shiftKey : this.shiftKey;
+      this.ctrlKey = code.includes('Control') ? false : this.ctrlKey;
+      if (!code.includes('Alt') && !code.includes('Caps') && !code.includes('Control')) {
         this.timeOut = setTimeout(() => {
           this.interval = setInterval(() => {
             this.handleKeyDown({ code });
-          }, 35);
-        }, 500);
+          }, 50);
+        }, 300);
       }
       this.handleKeyDown({ code });
     }
