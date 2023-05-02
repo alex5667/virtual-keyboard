@@ -32,7 +32,6 @@ export default class Keyboard {
   handleKeyDown(event) {
     const { code, ctrlKey, shiftKey } = event;
     const btn = this.keyPad.keyButtons.find((key) => key.code === code);
-    console.log(btn);
     if (btn) {
       if ((!event.type || event.type) && btn.keycode === '16') this.shiftKey = true;
       if (btn.keycode === '16') this.changeToUpperCase(true);
@@ -118,7 +117,7 @@ export default class Keyboard {
       document.querySelector('.keyPad').remove();
       this.keyPad = new KeyPad(this.lang, false);
     }
-    const caps = document.querySelector('.CapsLock');
+    const caps = document.querySelector('#CapsLock');
     if (this.isCaps) {
       caps.classList.add('active');
     }
@@ -133,7 +132,7 @@ export default class Keyboard {
     document.querySelector('.keyPad').remove();
     if (this.isCaps) {
       this.keyPad = new KeyPad(this.lang, true);
-      const caps = document.querySelector('.CapsLock');
+      const caps = document.querySelector('#CapsLock');
       caps.classList.add('active');
     }
     else {
@@ -204,16 +203,15 @@ export default class Keyboard {
     event.preventDefault();
     const btnDiv = event.target.closest('.keyPad__btn');
     if (!btnDiv) return;
-    const code = event.target.closest('.keyPad__btn').id;
-    if (event.type === 'mouseup') {
-      this.shiftKey = ['ShiftLeft', 'ShiftRight'].includes(code) ? true : this.shiftKey;
+
+    const code = btnDiv.id;
+    const isMouseDown = event.type === 'mousedown';
+    const isShiftKey = ['ShiftLeft', 'ShiftRight'].includes(code);
+
+    if (isMouseDown) {
+      this.shiftKey = isShiftKey ? !this.shiftKey : this.shiftKey;
       this.ctrlKey = code.includes('Control') ? false : this.ctrlKey;
-      clearTimeout(this.timeOut);
-      clearInterval(this.interval);
-      this.handleKeyUp({ code });
-    } else {
-      this.shiftKey = ['ShiftLeft', 'ShiftRight'].includes(code) ? !this.shiftKey : this.shiftKey;
-      this.ctrlKey = code.includes('Control') ? false : this.ctrlKey;
+
       if (!code.includes('Alt') && !code.includes('Caps') && !code.includes('Control')) {
         this.timeOut = setTimeout(() => {
           this.interval = setInterval(() => {
@@ -221,8 +219,17 @@ export default class Keyboard {
           }, 50);
         }, 300);
       }
+
       this.handleKeyDown({ code });
+    } else {
+      this.shiftKey = isShiftKey ? true : this.shiftKey;
+      this.ctrlKey = code.includes('Control') ? false : this.ctrlKey;
+
+      clearTimeout(this.timeOut);
+      clearInterval(this.interval);
+      this.handleKeyUp({ code });
     }
+
     this.textarea.focus();
   }
 }

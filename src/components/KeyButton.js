@@ -12,7 +12,7 @@ export default class KeyButton {
     this.at = render('div', 'at', this.isShiftKey ? this.shift : '');
     this.symbol = render('div', 'symbol', shiftDown && this.shift ? this.shift : small);
 
-    this.keyPadBtn = render('div', `keyPad__btn ${this.code}`, this.at ? [this.at, this.symbol] : this.symbol);
+    this.keyPadBtn = render('div', `keyPad__btn`, this.at ? [this.at, this.symbol] : this.symbol);
     this.keyPadBtn.id = this.code;
     this.isFn = !!(small === 'Ctrl' || small === 'Tab' || code.indexOf(small.slice(1) || false) + 1)
     if (this.isFn) {

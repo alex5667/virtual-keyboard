@@ -41,6 +41,7 @@
     transition: all 0.2s ease;
 
     &.active {
+      transform: scale(1.1);
       background-color: red;
     }
   }
@@ -76,7 +77,6 @@
     transform: translateY(50%);
     color: $mainColor;
     transition: all 0.5s ease;
-
   }
 }
 
@@ -86,4 +86,11 @@
   &.inactive {
     opacity: 0;
   }
+}
+
+.fn {
+  background-color: #1e3b14;
+}
+#Space {
+  min-width: rem(380);
 }
