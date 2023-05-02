@@ -221,6 +221,9 @@ h6 {
 }
 
 .keyPad__btn.active {
+  -webkit-transform: scale(1.1);
+      -ms-transform: scale(1.1);
+          transform: scale(1.1);
   background-color: red;
 }
 
@@ -280,4 +283,12 @@ h6 {
 
 .symbol.inactive {
   opacity: 0;
+}
+
+.fn {
+  background-color: #1e3b14;
+}
+
+#Space {
+  min-width: 23.75rem;
 }
