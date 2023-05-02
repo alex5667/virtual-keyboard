@@ -39,15 +39,37 @@ export default class Keyboard {
         this.isCaps = false;
         this.changeToUpperCase(false);
       }
+
+      if (event.type && btn.keycode === '17') this.ctrlKey = true;
+      if (btn.keycode === '18' && this.ctrlKey) {
+        if (event.type) event.preventDefault();
+        this.changeLanguage();
+
+        const regexp = /Tab|ArrowLeft|ArrowUp|ArrowDown|ArrowRight|Delete|Backspace|Enter/i;
+        const isFnKeyOrCtrl = btn.isFn || ctrlKey;
+        const isTabOrAlt = btn.code === 'Tab' || btn.code === 'Alt';
+        const isRegExpMatch = !event.type && btn.code.match(regexp);
+
+        if (!isFnKeyOrCtrl || isTabOrAlt || isRegExpMatch) {
+          if (event.type) {
+            event.preventDefault();
+          }
+
+          const isShiftKey = shiftKey || this.shiftKey;
+          const isCapsAndHasInnerText = this.isCaps && btn.symbol.innerText;
+          const isCapsAndShiftKey = this.isCaps && isShiftKey;
+          const shouldUseShift = isCapsAndHasInnerText || isCapsAndShiftKey || (isShiftKey && !this.isCaps);
+
+          this.handleKeyPress(btn, shouldUseShift ? btn.shift : btn.small);
+        }
+
+
+      }
       btn.keyPadBtn.classList.add('active');
       this.btnPressed[btn.code] = btn;
       this.textarea.focus();
     }
-    if (event.type && btn.keycode === '17') this.ctrlKey = true;
-    if (btn.keycode === '18' && this.ctrlKey) {
-      if (event.type) event.preventDefault();
-      this.changeLanguage();
-    }
+
 
   }
 
@@ -101,6 +123,64 @@ export default class Keyboard {
     }
   }
 
+  handleKeyPress(keyObj, symbol) {
+    let cursorPos = this.output.selectionStart;
+    const left = this.output.value.slice(0, cursorPos);
+    const right = this.output.value.slice(cursorPos);
+  
+    switch (keyObj.code) {
+      case 'Tab':
+        this.output.value = `${left}\t${right}`;
+        cursorPos++;
+        break;
+  
+      case 'ArrowLeft':
+        cursorPos = cursorPos - 1 >= 0 ? cursorPos - 1 : 0;
+        break;
+  
+      case 'ArrowRight':
+        cursorPos++;
+        break;
+  
+      case 'ArrowUp':
+        const positionFromUp = this.output.value.slice(0, cursorPos).match(/(\n).*$(?!\1)/g) || [[1]];
+        cursorPos -= positionFromUp[0].length;
+        break;
+  
+      case 'ArrowDown':
+        const positionFromDown = this.output.value.slice(cursorPos).match(/^.*(\n).*(?!\1)/) || [[1]];
+        cursorPos += positionFromDown[0].length + 1;
+        break;
+  
+      case 'Enter':
+        this.output.value = `${left}\n${right}`;
+        cursorPos++;
+        break;
+  
+      case 'Delete':
+        this.output.value = `${left}${right.slice(1)}`;
+        break;
+  
+      case 'Backspace':
+        this.output.value = `${left.slice(0, -1)}${right}`;
+        cursorPos--;
+        break;
+  
+      case 'Space':
+        this.output.value = `${left} ${right}`;
+        cursorPos += 1;
+        break;
+  
+      default:
+        if (!keyObj.isFnKey) {
+          cursorPos += 1;
+          this.output.value = `${left}${symbol || ''}${right}`;
+        }
+        break;
+    }
+  
+    this.output.setSelectionRange(cursorPos, cursorPos);
+  }
 
 
 }
