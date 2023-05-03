@@ -159,6 +159,13 @@ h6 {
   color: #667;
 }
 
+.header__link {
+  padding-top: 1.25rem;
+  line-height: 140%;
+  color: blue;
+  font-size: 1.125rem;
+}
+
 .main__container {
   display: -webkit-box;
   display: -ms-flexbox;

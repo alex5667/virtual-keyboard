@@ -16,4 +16,10 @@
     font-size: rem(20);
     color: $greyColor;
   }
+  &__link {
+    padding-top: rem(20);
+    line-height: 140%;
+    color: blue;
+    font-size: rem(18);
+  }
 }
