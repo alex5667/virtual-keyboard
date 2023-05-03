@@ -1,0 +1,96 @@
+.main {
+  &__container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+  }
+}
+
+.keyPad {
+  display: grid;
+  grid-row-gap: rem(15);
+  padding: rem(15);
+  border: 1px solid;
+  position: relative;
+  overflow: hidden;
+  background: #2c2c2c;
+  border-radius: 5px;
+  border: 3px solid $mainColor;
+  &__row {
+    display: grid;
+    grid-gap: rem(15);
+    grid-row-gap: rem(15);
+    height: 50px;
+  }
+
+  &__btn {
+    display: flex;
+    cursor: pointer;
+    border-radius: 3px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: rem(5);
+    background: $greyColor
+      radial-gradient(
+        circle at 0 0,
+        rgba(255, 255, 255, 0.75),
+        rgba(255, 255, 255, 0.35)
+      );
+    transition: all 0.2s ease;
+
+    &.active {
+      transform: scale(1.1);
+      background-color: red;
+    }
+  }
+}
+
+.textarea {
+  width: 100%;
+  height: rem(180);
+  padding: rem(15);
+  color: $mainColor;
+  box-sizing: border-box;
+  font-size: rem(18);
+  margin-top: rem(40);
+  margin-bottom: rem(20);
+  border: 1px solid $greyColor;
+  resize: vertical;
+}
+
+.at {
+  color: $greyColor;
+  text-align: center;
+  transition: all 0.5s ease;
+  width: 50%;
+  transform-origin: center top;
+  transform: translateX(-70%);
+  margin-bottom: 5px;
+
+  &.active {
+    font-size: rem(18);
+    padding-right: 10px;
+    transform-origin: center;
+    transform: translateX(50%);
+    transform: translateY(50%);
+    color: $mainColor;
+    transition: all 0.5s ease;
+  }
+}
+
+.symbol {
+  transition: all 0.5s ease;
+
+  &.inactive {
+    opacity: 0;
+  }
+}
+
+.fn {
+  background-color: #1e3b14;
+}
+#Space {
+  min-width: rem(380);
+}
